@@ -1,0 +1,98 @@
+#!/usr/bin/perl 
+use 5.034 ; use warnings ; 
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use Encode qw[ decode_utf8 encode_utf8 ] ; 
+use Getopt::Std ; getopts 'ah:l:' , \my %o  ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+use List::Util qw[ min max uniq ] ; 
+use utf8 ; 
+use Scalar::Util qw[ looks_like_number ] ; 
+
+no warnings ; 
+* d3 = exists $o{','} && $o{','} eq 0 ? sub{$_[0]} : sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+use warnings ; 
+
+$o{l} //= 100 ;  # 「ページ指定」受付最大文字列長さ
+my $p1 ; # 元のPDFファイルの最初のページ番号
+my $p2 ; # 元のPDFファイルの最後のページ番号
+my $p2a ; # $p2より小さく 、( ($p2a-1) - ($p1-1) ) が4の倍数となる最大の数。
+
+# コマンド引数から、与え方に応じて3通りに、ページ数の最初と最後を取り出す。
+($p1,$p2) = $ARGV[0] =~ m/(\d+)-(\d+)/ ? ($1,$2) : exists $ARGV[1] ? @ARGV : (1,$ARGV[0]) ; 
+exit if map {say "'$_' seems not a numbper."} grep { ! looks_like_number $_ } ($p1,$p2) ;
+
+# 最後に出力する紙の処理 および 出力枚数の算出
+my $pr = ($p2-$p1+1) % 4 ; # reminder 余り
+$p2a = $p2 - $pr + 1 ; 
+my $q = ($p2a-$p1) / 4 ; 
+
+#perl -E'$p=1;splice@P,@P/2,0,$_?($p++."-".$p++,$p++."-".$p++):$p."-".($p+3)for-4..0 ;say join",",@P'
+
+my @P = () ; 
+my $p = $p1 ;
+for ( 1 .. $q ) { 
+  splice @P , @P/2 , 0 , $p++ . "-" . $p++ , $p++ . "-" . $p++
+}
+say join "," , @P ; 
+
+# 最後のページの出力。4の倍数か否か、1枚だけか否かにより、3通りに分けた。
+print $p2a < $p2 ? "$p2a-$p2\n" : $p2a == $p2 ? "$p2\n" : '' ; # 最後のページ
+exit ;
+
+END {
+  my $procsec = sprintf "%.5f", tv_interval ${ dt_start } ; #time - $time0 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+  return if ($o{2}//'') eq 0 ; 
+  my $s = tv_interval $dt_start , [ gettimeofday ] ; 
+  say STDERR BOLD FAINT ITALIC " -- $Script ; " . $procsec . " seconds in process" ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+=encoding utf8
+
+=head1 $0 
+
+bookletps NUMBER_OF_PAGES
+bookletps N1 N2 
+bookletps N1-N2
+   NUMER_OF_PAGES は、出力したい元のPDFファイルのページ数である。1始まりを仮定。
+   N1 と N2 は、最初のページ番号 と 最後のページ番号である。
+
+  Adobe Acrobat Reader 等のソフトウェアで PDFファイルの「小冊子」印刷をする時に、
+  通常多くの場合は、印刷された紙に印刷される内容は、1～4、5～8ページ目... のようには
+  ならない。最初の紙に1,2,7,8ページ目、最後の紙に3,4,5,6ページ目のようになってしまう。
+  このように印刷された紙だと、印刷された紙を1枚ずつ半分に手で折って、重ねて、背表紙を
+  のり付けするのに不便である。
+
+  「ページ指定」を工夫することで、この不便さを回避できる。そのページ指定をする時に使う
+  文字列をこのコマンド$0は標準出力に出力する。複数回印刷をする必要がある場合
+  (元のPDFファイルのページの数が4で無い場合およびページ数が多い場合)、出力は改行文字で
+  区切られて表示される。
+
+使用例 : 
+  bookletps 8  # 1-2,5-8,3-4
+  bookletps 9  # 1-2,5-8,3-4 の次の行に 9
+  bookletps 40 # 1-2,5-6,9-10,13-14,17-20,15-16,11-12,7-8,3-4 に続けて
+               # 21-22,25-26,29-30,33-34,37-40,35-36,31-32,27-28,23-24
+オプション :
+ -a     : 出力する文字列を、- や , で区切らずに、ばらばらの数を全て、半角空白文字区切りで出力する。
+ -h 0   : ハイフン(-)を出来るだけ使わずに、コンマ(,)を使う様にする。出力文字列中央の一箇所のみハイフンは残るであろう。 
+ -l N   : 未指定だと100。「ページ指定」は100文字以下の制限があるので、指定文字列の各長さを制限する。
+ --help : このオンラインヘルプの文面を表示する。
+
+開発メモ : 
+  * ローマ数字指定に対応していない。(pdftkなどのコマンド出力を利用するなどの方法が考えられる。)
+=cut
