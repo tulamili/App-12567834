@@ -1,6 +1,6 @@
 package App::12567834 ;  
-our $VERSION = '0.020' ; 
-our $DATE = '2025-04-01T19:20+09:00' ; 
+our $VERSION = '0.021' ; 
+our $DATE = '2025-04-02T15:10+09:00' ; 
 
 =encoding utf8
 
@@ -39,14 +39,16 @@ The printing will be split across multiple operations as needed.
 Each of these page range strings will be displayed separated by line breaks.
 This makes it possible to specify around 30 pages of the original PDF file in a single operation.
 
-For convenience, an option `-P' is also provided to output strings that can be used with PDFTK.
+For convenience, an option `-P' is also provided to output strings that can be used with PDFtk.
 
 To learn more about how it works, run the help option using 12567834 --help.
 
 =head1 SEE ALSO
 
 12567834 --help
+
 man 12567834
+
 perldoc 12567834
 
 =cut
