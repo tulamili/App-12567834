@@ -12,7 +12,9 @@
 
 (3) しかし、このまま小冊子印刷をしてしまうと、小冊子専門のホッチキスを用いるしか方法がなくなってしまう(!) 
 その理由は、8ページであれば、次の図のようになってしまうからである。
+
 ![image](https://github.com/user-attachments/assets/1b81c031-c1db-4960-9945-5cd3f96ae4b2)
+
 この図はhttps://helpx.adobe.com/jp/acrobat/kb/print-booklets-acrobat-reader.html を参照した。
 
 つまり、1,2,7,8ページ目が印刷された1枚目、3,4,5,6ページ目が印刷された2枚目に来てしまう。
@@ -33,6 +35,7 @@
 ```
 
 実際に入力すると、次の様になるが、24文字幅なので、次の様に一部のみが表示される。  
+
 ![image](https://github.com/user-attachments/assets/97a025f0-17fb-4edf-a39f-db734076dcaa)
 
 上記の、56文字を生成するのが、このライブラリが提供する 12783456 という名前のコマンドである。
