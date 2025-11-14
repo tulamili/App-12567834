@@ -5,7 +5,7 @@ pages from the original PDF in sequential order.
 
 This is to avoid that, for a 8-page pdf file, the page numbering order
 of the papers from a printer for the booklet printing is, usually,
-1,2,7,8,3,4,5,6 not in 1,2,3,4,5,6,7.8. 
+1,2,7,8,3,4,5,6 not in 1,2,3,4,5,6,7,8. 
 
 By running a command sentence
 `12345678 8' you get 1-2,5-8,3-4 that can easily be copied and pasted 
