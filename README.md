@@ -1,11 +1,13 @@
 
 The command `12567834' yields the character strings which specifies how to 
-enter the page number specification so that every printed paper contains four 
+set the page number specification so that every printed paper contains four 
 pages from the original PDF in sequential order. 
 
 This is to avoid that, for a 8-page pdf file, the page numbering order
 of the papers from a printer for the booklet printing is, usually,
-1,2,7,8,3,4,5,6 not in 1,2,3,4,5,6,7.8. - By running a command sentence
+1,2,7,8,3,4,5,6 not in 1,2,3,4,5,6,7.8. 
+
+By running a command sentence
 `12345678 8' you get 1-2,5-8,3-4 that can easily be copy and pasted 
 into the page number specification to the printing menu so that you 
 get the printed paper to be folded into a booklet with a page numbering
